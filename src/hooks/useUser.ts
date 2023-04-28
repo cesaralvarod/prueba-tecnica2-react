@@ -37,12 +37,12 @@ export const useUser = () => {
             .toLowerCase()
             .includes(filterCountry.trimStart().toLowerCase())
         )
-      : initialUsers.current
+      : users
   }, [filterCountry, users])
 
   const sortedUsers = useMemo(() => {
     return sortByCountry
-      ? [...users].sort((a, b) =>
+      ? [...filteredUsers].sort((a, b) =>
           a.location.country.localeCompare(b.location.country)
         ) // usar toSorted es ideal, pero no esta disponible
       : filteredUsers
