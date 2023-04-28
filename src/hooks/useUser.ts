@@ -2,7 +2,15 @@ import { useEffect, useRef, useContext, useMemo } from 'react'
 import { SortBy, User } from '../interfaces/Users'
 import { UserContext } from '../context/UserContext'
 
-const API_URL = 'https://randomuser.me/api/?results=10&seed=cesaralvarod'
+const fetchUsers = async (page: number) =>
+  await fetch(
+    `https://randomuser.me/api/?results=10&seed=cesaralvarod&page=${page}`
+  )
+    .then(res => {
+      if (!res.ok) throw new Error('An error occurred while fetching users')
+      return res.json()
+    })
+    .then(data => data.results)
 
 export const useUser = () => {
   const { state, actions } = useContext(UserContext)
@@ -21,29 +29,21 @@ export const useUser = () => {
   const initialUsers = useRef<User[]>([])
 
   useEffect(() => {
-    const fetchData = () => {
-      setLoading(true)
-      fetch(`${API_URL}&page=${currentPage}`)
-        .then(res => {
-          if (!res.ok) throw new Error('An error occurred while fetching users')
-          return res.json()
-        })
-        .then(data => {
-          const newUsers = [...users, ...data.results]
-          setUsers(newUsers)
-          initialUsers.current = newUsers
-        })
-        .catch(err => {
-          console.log(err)
-          setError(err)
-          setUsers([])
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    }
-
-    fetchData()
+    setLoading(true)
+    fetchUsers(currentPage)
+      .then(data => {
+        const newUsers = [...users, ...data]
+        setUsers(newUsers)
+        initialUsers.current = newUsers
+      })
+      .catch(err => {
+        console.log(err)
+        setError(err)
+        setUsers([])
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [currentPage])
 
   const filteredUsers = useMemo(() => {
