@@ -2,7 +2,7 @@ import { useEffect, useRef, useContext, useMemo } from 'react'
 import { SortBy, User } from '../interfaces/Users'
 import { UserContext } from '../context/UserContext'
 
-const API_URL = 'https://randomuser.me/api/?results='
+const API_URL = 'https://randomuser.me/api/?results=100'
 
 export const useUser = () => {
   const { state, actions } = useContext(UserContext)
@@ -14,7 +14,7 @@ export const useUser = () => {
 
   useEffect(() => {
     const fetchData = () => {
-      fetch(API_URL + 5)
+      fetch(API_URL)
         .then(data => data.json())
         .then(data => {
           setUsers(data.results)
