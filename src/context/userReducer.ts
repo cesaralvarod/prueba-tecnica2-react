@@ -1,12 +1,12 @@
-import { User } from '../interfaces/Users'
+import { SortBy, User } from '../interfaces/Users'
 import { UserState } from './UserContext'
 
 export enum UserActionsKind {
   SET_USERS,
   SET_SHOW_COLORS,
-  SET_SORT_BY_COUNTRY,
   SET_ERROR,
   SET_FILTER_COUNTRY,
+  SET_SORTING,
 }
 
 type SetUsersAction = {
@@ -16,11 +16,6 @@ type SetUsersAction = {
 
 type SetShowColorsAction = {
   type: UserActionsKind.SET_SHOW_COLORS
-  payload: boolean
-}
-
-type SetSortByCountryAction = {
-  type: UserActionsKind.SET_SORT_BY_COUNTRY
   payload: boolean
 }
 
@@ -34,12 +29,17 @@ type SetFilterCountryAction = {
   payload: string | null
 }
 
+type SetSortingAction = {
+  type: UserActionsKind.SET_SORTING
+  payload: SortBy
+}
+
 export type UserActionReducer =
   | SetUsersAction
   | SetShowColorsAction
-  | SetSortByCountryAction
   | SetErrorAction
   | SetFilterCountryAction
+  | SetSortingAction
 
 export const userReducer = (state: UserState, action: UserActionReducer) => {
   switch (action.type) {
@@ -49,14 +49,14 @@ export const userReducer = (state: UserState, action: UserActionReducer) => {
     case UserActionsKind.SET_SHOW_COLORS:
       return { ...state, showColors: action.payload }
 
-    case UserActionsKind.SET_SORT_BY_COUNTRY:
-      return { ...state, sortByCountry: action.payload }
-
     case UserActionsKind.SET_ERROR:
       return { ...state, error: action.payload }
 
     case UserActionsKind.SET_FILTER_COUNTRY:
       return { ...state, filterCountry: action.payload }
+
+    case UserActionsKind.SET_SORTING:
+      return { ...state, sorting: action.payload }
 
     default:
       return state

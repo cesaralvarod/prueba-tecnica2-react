@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 
 import { UserContext } from '../context/UserContext'
+import { SortBy } from '../interfaces/Users'
 
 interface Props {
   handleReset: () => void
@@ -8,11 +9,12 @@ interface Props {
 
 export default function Buttons({ handleReset }: Props) {
   const { state, actions } = useContext(UserContext)
-  const { showColors, sortByCountry } = state
-  const { setShowColors, setSortByCountry, setFilterCountry } = actions
+  const { showColors, sorting } = state
+  const { setShowColors, setFilterCountry, setSorting } = actions
 
   const handleToggleShowColors = () => setShowColors(!showColors)
-  const handleSortByCountry = () => setSortByCountry(!sortByCountry)
+  const handleSortByCountry = () =>
+    setSorting(sorting === SortBy.COUNTRY ? SortBy.NONE : SortBy.COUNTRY)
 
   return (
     <div className="pb-5 flex gap-2">
@@ -25,7 +27,7 @@ export default function Buttons({ handleReset }: Props) {
       </button>
       <button
         className={`bg-red-200 hover:bg-red-300 px-4 py-1 font-bold text-slate-700 rounded-lg ${
-          sortByCountry && 'bg-red-300'
+          sorting === SortBy.COUNTRY && 'bg-red-300'
         }`}
         onClick={handleSortByCountry}>
         Sort by country

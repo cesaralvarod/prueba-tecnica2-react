@@ -1,13 +1,14 @@
 import { ReactNode, useReducer } from 'react'
 import { UserActions, UserContext, UserState } from './UserContext'
 import { UserActionsKind, userReducer } from './userReducer'
+import { SortBy } from '../interfaces/Users'
 
 const INITIAL_STATE: UserState = {
   users: [],
   showColors: false,
-  sortByCountry: false,
   error: null,
   filterCountry: null,
+  sorting: SortBy.NONE,
 }
 
 interface Props {
@@ -23,14 +24,14 @@ export function UsersProvider({ children }: Props) {
   const setShowColors: UserActions['setShowColors'] = payload =>
     dispatch({ type: UserActionsKind.SET_SHOW_COLORS, payload })
 
-  const setSortByCountry: UserActions['setSortByCountry'] = payload =>
-    dispatch({ type: UserActionsKind.SET_SORT_BY_COUNTRY, payload })
-
   const setError: UserActions['setError'] = payload =>
     dispatch({ type: UserActionsKind.SET_ERROR, payload })
 
   const setFilterCountry: UserActions['setFilterCountry'] = payload =>
     dispatch({ type: UserActionsKind.SET_FILTER_COUNTRY, payload })
+
+  const setSorting: UserActions['setSorting'] = payload =>
+    dispatch({ type: UserActionsKind.SET_SORTING, payload })
 
   return (
     <UserContext.Provider
@@ -39,9 +40,9 @@ export function UsersProvider({ children }: Props) {
         actions: {
           setUsers,
           setShowColors,
-          setSortByCountry,
           setError,
           setFilterCountry,
+          setSorting,
         },
       }}>
       {children}

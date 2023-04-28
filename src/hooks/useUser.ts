@@ -1,5 +1,5 @@
 import { useEffect, useRef, useContext, useMemo } from 'react'
-import { User } from '../interfaces/Users'
+import { SortBy, User } from '../interfaces/Users'
 import { UserContext } from '../context/UserContext'
 
 const API_URL = 'https://randomuser.me/api/?results='
@@ -7,7 +7,7 @@ const API_URL = 'https://randomuser.me/api/?results='
 export const useUser = () => {
   const { state, actions } = useContext(UserContext)
 
-  const { users, showColors, sortByCountry, error, filterCountry } = state
+  const { users, showColors, error, filterCountry, sorting } = state
   const { setUsers, setError } = actions
 
   const initialUsers = useRef<User[]>([])
@@ -41,12 +41,19 @@ export const useUser = () => {
   }, [filterCountry, users])
 
   const sortedUsers = useMemo(() => {
-    return sortByCountry
-      ? [...filteredUsers].sort((a, b) =>
-          a.location.country.localeCompare(b.location.country)
-        ) // usar toSorted es ideal, pero no esta disponible
-      : filteredUsers
-  }, [sortByCountry, filteredUsers])
+    const compareProperties: Record<string, (user: User) => string> = {
+      [SortBy.COUNTRY]: user => user.location.country,
+      [SortBy.NAME]: user => user.name.first,
+      [SortBy.LASTNAME]: user => user.name.last,
+    }
+
+    if (sorting === SortBy.NONE) return filteredUsers
+
+    return [...filteredUsers].sort((a, b) => {
+      const extractProperty = compareProperties[sorting]
+      return extractProperty(a).localeCompare(extractProperty(b))
+    }) // otra alternativa es usar toSorted
+  }, [filteredUsers, sorting])
 
   const handleDelete = (uuid: string) => {
     const filteredUsers = users.filter(user => user.login.uuid !== uuid)
@@ -60,7 +67,6 @@ export const useUser = () => {
   return {
     users: sortedUsers,
     showColors,
-    sortByCountry,
     error,
 
     handleDelete,

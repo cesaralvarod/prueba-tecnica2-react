@@ -1,3 +1,10 @@
+export enum SortBy {
+  NONE,
+  NAME,
+  LASTNAME,
+  COUNTRY,
+}
+
 export interface UsersResponse {
   results: User[]
   info: Info
