@@ -2,33 +2,49 @@ import { useEffect, useRef, useContext, useMemo } from 'react'
 import { SortBy, User } from '../interfaces/Users'
 import { UserContext } from '../context/UserContext'
 
-const API_URL = 'https://randomuser.me/api/?results=100'
+const API_URL = 'https://randomuser.me/api/?results=10&seed=cesaralvarod'
 
 export const useUser = () => {
   const { state, actions } = useContext(UserContext)
 
-  const { users, showColors, error, filterCountry, sorting } = state
-  const { setUsers, setError } = actions
+  const {
+    users,
+    showColors,
+    error,
+    filterCountry,
+    sorting,
+    loading,
+    currentPage,
+  } = state
+  const { setUsers, setError, setLoading, setCurrentPage } = actions
 
   const initialUsers = useRef<User[]>([])
 
   useEffect(() => {
     const fetchData = () => {
-      fetch(API_URL)
-        .then(data => data.json())
+      setLoading(true)
+      fetch(`${API_URL}&page=${currentPage}`)
+        .then(res => {
+          if (!res.ok) throw new Error('An error occurred while fetching users')
+          return res.json()
+        })
         .then(data => {
-          setUsers(data.results)
-          initialUsers.current = data.results
+          const newUsers = [...users, ...data.results]
+          setUsers(newUsers)
+          initialUsers.current = newUsers
         })
         .catch(err => {
           console.log(err)
-          setError('An error occurred while fetching users')
+          setError(err)
           setUsers([])
+        })
+        .finally(() => {
+          setLoading(false)
         })
     }
 
     fetchData()
-  }, [])
+  }, [currentPage])
 
   const filteredUsers = useMemo(() => {
     return typeof filterCountry === 'string' && filterCountry.length > 0
@@ -68,8 +84,11 @@ export const useUser = () => {
     users: sortedUsers,
     showColors,
     error,
+    loading,
+    currentPage,
 
     handleDelete,
     handleReset,
+    setCurrentPage,
   }
 }

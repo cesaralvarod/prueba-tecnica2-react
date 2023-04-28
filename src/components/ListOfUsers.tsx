@@ -84,16 +84,19 @@ export default function ListOfUsers({ users, handleDelete }: Props) {
           </tr>
         </thead>
         <tbody>
-          {users.map((user: User, index: number) => (
-            <UserRow
-              key={user.login.uuid}
-              user={user}
-              index={index}
-              showColors={showColors}
-              handleDelete={handleDelete}
-            />
-          ))}
-          {users.length === 0 && <NoData />}
+          {users.length === 0 ? (
+            <NoData />
+          ) : (
+            users.map((user: User, index: number) => (
+              <UserRow
+                key={user.login.uuid}
+                user={user}
+                index={index}
+                showColors={showColors}
+                handleDelete={handleDelete}
+              />
+            ))
+          )}
         </tbody>
       </table>
     </div>

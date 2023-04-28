@@ -4,9 +4,11 @@ import { SortBy, User } from '../interfaces/Users'
 export type UserState = {
   users: User[]
   showColors: boolean
-  error: string | null
   filterCountry: string | null
   sorting: SortBy
+  currentPage: number
+  error: string | null
+  loading: boolean
 }
 export type UserActions = {
   setUsers: (arg0: User[]) => void
@@ -14,6 +16,8 @@ export type UserActions = {
   setError: (arg0: string | null) => void
   setFilterCountry: (arg0: string | null) => void
   setSorting: (arg0: SortBy) => void
+  setLoading: (arg0: boolean) => void
+  setCurrentPage: (arg0: number) => void
 }
 
 export interface UserContextValue {

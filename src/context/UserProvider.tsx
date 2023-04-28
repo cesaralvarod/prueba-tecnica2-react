@@ -6,9 +6,11 @@ import { SortBy } from '../interfaces/Users'
 const INITIAL_STATE: UserState = {
   users: [],
   showColors: false,
-  error: null,
   filterCountry: null,
   sorting: SortBy.NONE,
+  currentPage: 1,
+  error: null,
+  loading: false,
 }
 
 interface Props {
@@ -33,6 +35,12 @@ export function UsersProvider({ children }: Props) {
   const setSorting: UserActions['setSorting'] = payload =>
     dispatch({ type: UserActionsKind.SET_SORTING, payload })
 
+  const setLoading: UserActions['setLoading'] = payload =>
+    dispatch({ type: UserActionsKind.SET_LOADING, payload })
+
+  const setCurrentPage: UserActions['setCurrentPage'] = payload =>
+    dispatch({ type: UserActionsKind.SET_CURRENT_PAGE, payload })
+
   return (
     <UserContext.Provider
       value={{
@@ -40,9 +48,11 @@ export function UsersProvider({ children }: Props) {
         actions: {
           setUsers,
           setShowColors,
-          setError,
           setFilterCountry,
           setSorting,
+          setCurrentPage,
+          setError,
+          setLoading,
         },
       }}>
       {children}

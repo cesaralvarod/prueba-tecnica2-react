@@ -6,7 +6,9 @@ export enum UserActionsKind {
   SET_SHOW_COLORS,
   SET_ERROR,
   SET_FILTER_COUNTRY,
+  SET_CURRENT_PAGE,
   SET_SORTING,
+  SET_LOADING,
 }
 
 type SetUsersAction = {
@@ -34,12 +36,24 @@ type SetSortingAction = {
   payload: SortBy
 }
 
+type SetLoading = {
+  type: UserActionsKind.SET_LOADING
+  payload: boolean
+}
+
+type SetCurrentPage = {
+  type: UserActionsKind.SET_CURRENT_PAGE
+  payload: number
+}
+
 export type UserActionReducer =
   | SetUsersAction
   | SetShowColorsAction
   | SetErrorAction
   | SetFilterCountryAction
   | SetSortingAction
+  | SetLoading
+  | SetCurrentPage
 
 export const userReducer = (state: UserState, action: UserActionReducer) => {
   switch (action.type) {
@@ -57,6 +71,12 @@ export const userReducer = (state: UserState, action: UserActionReducer) => {
 
     case UserActionsKind.SET_SORTING:
       return { ...state, sorting: action.payload }
+
+    case UserActionsKind.SET_LOADING:
+      return { ...state, loading: action.payload }
+
+    case UserActionsKind.SET_CURRENT_PAGE:
+      return { ...state, currentPage: action.payload }
 
     default:
       return state
