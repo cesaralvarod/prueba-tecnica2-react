@@ -6,11 +6,11 @@ import { useUser } from './hooks/useUser'
 function App() {
   const {
     users,
+    loading,
+    currentPage,
     handleDelete,
     handleReset,
-    loading,
     setCurrentPage,
-    currentPage,
   } = useUser()
 
   return (
