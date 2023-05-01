@@ -1,50 +1,30 @@
-import { useEffect, useRef, useContext, useMemo } from 'react'
+import { useContext, useMemo } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+
 import { SortBy, User } from '../interfaces/Users'
 import { UserContext } from '../context/UserContext'
-
-const fetchUsers = async (page: number) =>
-  await fetch(
-    `https://randomuser.me/api/?results=10&seed=cesaralvarod&page=${page}`
-  )
-    .then(res => {
-      if (!res.ok) throw new Error('An error occurred while fetching users')
-      return res.json()
-    })
-    .then(data => data.results)
+import { FetchResponse, fetchUsers } from '../services/users'
 
 export const useUser = () => {
+  const {
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    hasNextPage,
+    data,
+    refetch,
+    fetchNextPage,
+  } = useInfiniteQuery<FetchResponse>(['users'], fetchUsers, {
+    getNextPageParam: lastPage => lastPage.nextCursor,
+    refetchOnWindowFocus: false,
+  })
+
+  const users: User[] = data?.pages?.flatMap(page => page.users) ?? [] // flatMap -> aplanar a un mismo nivel
+
   const { state, actions } = useContext(UserContext)
 
-  const {
-    users,
-    showColors,
-    error,
-    filterCountry,
-    sorting,
-    loading,
-    currentPage,
-  } = state
-  const { setUsers, setError, setLoading, setCurrentPage } = actions
-
-  const initialUsers = useRef<User[]>([])
-
-  useEffect(() => {
-    setLoading(true)
-    fetchUsers(currentPage)
-      .then(data => {
-        const newUsers = [...users, ...data]
-        setUsers(newUsers)
-        initialUsers.current = newUsers
-      })
-      .catch(err => {
-        console.log(err)
-        setError(err)
-        setUsers([])
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [currentPage])
+  const { showColors, filterCountry, sorting } = state
+  const { setUsers } = actions
 
   const filteredUsers = useMemo(() => {
     return typeof filterCountry === 'string' && filterCountry.length > 0
@@ -76,19 +56,17 @@ export const useUser = () => {
     setUsers(filteredUsers)
   }
 
-  const handleReset = () => {
-    setUsers(initialUsers.current)
-  }
+  const handleReset = async () => await refetch()
 
   return {
     users: sortedUsers,
     showColors,
-    error,
-    loading,
-    currentPage,
+    isLoading: isLoading || isFetchingNextPage,
+    isError,
+    hasNextPage,
 
     handleDelete,
     handleReset,
-    setCurrentPage,
+    fetchNextPage,
   }
 }
